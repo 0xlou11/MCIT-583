@@ -11,7 +11,7 @@ infura_url = f"https://mainnet.infura.io/v3/{infura_token}"
 
 
 def connect_to_eth():
-	url = "https://eth-mainnet.alchemyapi.io/v2/{alchemy_token}"  # FILL THIS IN
+	url = f"https://eth-mainnet.alchemyapi.io/v2/{alchemy_token}"  # FILL THIS IN
 	w3 = Web3(HTTPProvider(url))
 	assert w3.is_connected(), f"Failed to connect to provider at {url}"
 	return w3
