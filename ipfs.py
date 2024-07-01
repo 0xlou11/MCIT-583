@@ -29,17 +29,20 @@ def pin_to_ipfs(data):
     else:
         raise Exception(f"Error pinning to IPFS: {response.content}")
 
-def get_from_ipfs(cid,content_type="json"):
-	assert isinstance(cid,str), f"get_from_ipfs accepts a cid in the form of a string"
-	#YOUR CODE HERE	
-	response = requests.get(f"https://gateway.pinata.cloud/ipfs/{cid}")
-    
-  if response.status_code == 200:
-        json_data = response.text
-				data = json.loads(json_data)
-				assert isinstance(data, dict), f"Error: get_from_ipfs should return a dict"
-				return data
+def get_from_ipfs(cid, content_type="json"):
+    assert isinstance(cid, str), f"Error: get_from_ipfs accepts a CID in the form of a string"
 
+    response = requests.get(f"https://gateway.pinata.cloud/ipfs/{cid}")
+    
+    if response.status_code == 200:
+        json_data = response.text
+        
+        if content_type == "json":
+            data = json.loads(json_data)
+            assert isinstance(data, dict), f"Error: get_from_ipfs should return a dict"
+            return data
+        else:
+            raise ValueError(f"Unsupported content type: {content_type}")
     else:
         raise Exception(f"Error getting data from IPFS: {response.content}")
 
