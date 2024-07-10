@@ -51,28 +51,25 @@ def is_ordered_block(w3, block_num):
 
 	# TODO YOUR CODE HERE
 	transactions = block['transactions']
-	if len(transactions) == 0 or len(transactions) == 1:
-        	return True
-
 	base_fee = block.get('baseFeePerGas', 0)
-	if isinstance(base_fee, str):
-		base_fee = int(base_fee, 16)
-	
-	for i in range(len(transactions) - 1):
-		tx1 = transactions[i]
-		tx2 = transactions[i + 1]
-	
-		if 'gasPrice' in tx1 and 'gasPrice' in tx2:
-		    priority_fee1 = int(tx1['gasPrice'])
-		    priority_fee2 = int(tx2['gasPrice'])
-		else:
-		    priority_fee1 = (int(tx1['gasPrice']) - base_fee) if 'gasPrice' in tx1 else min(int(tx1.get('maxPriorityFeePerGas', 0)), int(tx1.get('maxFeePerGas', 0)) - base_fee)
-		    priority_fee2 = (int(tx2['gasPrice']) - base_fee) if 'gasPrice' in tx2 else min(int(tx2.get('maxPriorityFeePerGas', 0)), int(tx2.get('maxFeePerGas', 0)) - base_fee)
-	
-		if priority_fee1 < priority_fee2:
-		    return False
-	return True
+	if len(transactions) == 0 or len(transactions) == 1:
+		return True
 
+	for i in range(len(transactions) - 1):
+			tx1 = transactions[i]
+			tx2 = transactions[i + 1]
+
+			if 'gasPrice' in tx1 and 'gasPrice' in tx2:
+					priority_fee1 = tx1['gasPrice']
+					priority_fee2 = tx2['gasPrice']
+			else:
+					priority_fee1 = (tx1['gasPrice'] - base_fee) if 'gasPrice' in tx1 else min(tx1.get('maxPriorityFeePerGas', 0), tx1.get('maxFeePerGas', 0) - base_fee)
+					priority_fee2 = (tx2['gasPrice'] - base_fee) if 'gasPrice' in tx2 else min(tx2.get('maxPriorityFeePerGas', 0), tx2.get('maxFeePerGas', 0) - base_fee)
+
+			if priority_fee1 < priority_fee2:
+					return False
+
+	return True
 
 def get_contract_values(contract, admin_address, owner_address):
 	"""
@@ -93,12 +90,9 @@ def get_contract_values(contract, admin_address, owner_address):
 	# TODO complete the following lines by performing contract calls
 	onchain_root = contract.functions.merkleRoot().call()  # Get and return the merkleRoot from the provided contract
 	has_role = contract.functions.hasRole(default_admin_role, admin_address).call()  # Check the contract to see if the address "admin_address" has the role "default_admin_role"
-	try:
-		prime = contract.functions.prime(owner_address).call()# Call the contract to get the prime owned by "owner_address"
 
-	except Exception as e:
-	        print(f"Error: {e}")
-	        prime = None
+  prime = contract.functions.prime(owner_address).call()# Call the contract to get the prime owned by "owner_address"
+
 	return onchain_root, has_role, prime
 
 
