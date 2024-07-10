@@ -52,19 +52,19 @@ def is_ordered_block(w3, block_num):
 	# TODO YOUR CODE HERE
 	transactions = block['transactions']
 	for i in range(len(transactions) - 1):
-			tx1 = transactions[i]
-			tx2 = transactions[i + 1]
-			
-			if 'gasPrice' in tx1 and 'gasPrice' in tx2:
-					if tx1['gasPrice'] < tx2['gasPrice']:
-							return False
-			else:
-					priority_fee1 = tx1['gasPrice'] - block['baseFeePerGas'] if 'gasPrice' in tx1 else min(tx1['maxPriorityFeePerGas'], tx1['maxFeePerGas'] - block['baseFeePerGas'])
-					priority_fee2 = tx2['gasPrice'] - block['baseFeePerGas'] if 'gasPrice' in tx2 else min(tx2['maxPriorityFeePerGas'], tx2['maxFeePerGas'] - block['baseFeePerGas'])
-					
-					if priority_fee1 < priority_fee2:
-							return False
-	
+        tx1 = transactions[i]
+        tx2 = transactions[i + 1]
+
+        if 'gasPrice' in tx1 and 'gasPrice' in tx2:
+            priority_fee1 = tx1['gasPrice']
+            priority_fee2 = tx2['gasPrice']
+        else:
+            base_fee = block['baseFeePerGas']
+            priority_fee1 = (tx1['gasPrice'] - base_fee) if 'gasPrice' in tx1 else min(tx1['maxPriorityFeePerGas'], tx1['maxFeePerGas'] - base_fee)
+            priority_fee2 = (tx2['gasPrice'] - base_fee) if 'gasPrice' in tx2 else min(tx2['maxPriorityFeePerGas'], tx2['maxFeePerGas'] - base_fee)
+
+        if priority_fee1 < priority_fee2:
+            return False
 	ordered = True
 	return ordered
 
@@ -88,7 +88,8 @@ def get_contract_values(contract, admin_address, owner_address):
 	# TODO complete the following lines by performing contract calls
 	onchain_root = contract.functions.merkleRoot().call()  # Get and return the merkleRoot from the provided contract
 	has_role = contract.functions.hasRole(default_admin_role, admin_address).call()  # Check the contract to see if the address "admin_address" has the role "default_admin_role"
-	prime = contract.functions.prime(owner_address).call()  # Call the contract to get the prime owned by "owner_address"
+
+  prime = contract.functions.prime(owner_address).call()# Call the contract to get the prime owned by "owner_address"
 
 	return onchain_root, has_role, prime
 
