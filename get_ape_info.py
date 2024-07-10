@@ -14,7 +14,7 @@ contract_address = Web3.to_checksum_address(bayc_address)
 #https://api.etherscan.io/api?module=contract&action=getabi&address=0xBC4CA0EdA7647A8aB7C2061c2E118A18a936f13D
 with open('/home/codio/workspace/abi.json', 'r') as f:
 	abi = json.load(f) 
-contract = Web3.eth.contract(address=contract_address, abi=abi)
+contract = web3.eth.contract(address=contract_address, abi=abi)
 ############################
 #Connect to an Ethereum node
 api_url = f"https://eth-mainnet.alchemyapi.io/v2/GOAqXUQqWHv71kkCL_vyf_joq0kEfqNG" #YOU WILL NEED TO TO PROVIDE THE URL OF AN ETHEREUM NODE
