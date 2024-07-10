@@ -52,14 +52,14 @@ def is_ordered_block(w3, block_num):
 	# TODO YOUR CODE HERE
 	transactions = block['transactions']
 	for i in range(len(transactions) - 1):
-        tx1 = transactions[i]
-        tx2 = transactions[i + 1]
-
-        priority_fee1 = get_priority_fee(tx1)
-        priority_fee2 = get_priority_fee(tx2)
-
-        if priority_fee1 < priority_fee2:
-            return False
+	        tx1 = transactions[i]
+	        tx2 = transactions[i + 1]
+	
+	        priority_fee1 = get_priority_fee(tx1)
+	        priority_fee2 = get_priority_fee(tx2)
+	
+	        if priority_fee1 < priority_fee2:
+	            return False
 	ordered = True
 	return ordered
 
