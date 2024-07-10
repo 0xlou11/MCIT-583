@@ -52,7 +52,7 @@ def is_ordered_block(w3, block_num):
 	# TODO YOUR CODE HERE
 	transactions = block['transactions']
 	base_fee = block.get('baseFeePerGas', 0)
-	if len(transactions) == 0 || len(transactions) == 1:
+	if len(transactions) == 0 or len(transactions) == 1:
 		return True
 		
 	for i in range(len(transactions) - 1):
