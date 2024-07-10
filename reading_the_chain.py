@@ -22,9 +22,9 @@ def connect_with_middleware(contract_json):
 	# TODO insert your code for this method from last week's assignment
 	with open(contract_json, "r") as f:
 		d = json.load(f)
-		d = d['bsc']
-		address = d['address']
-		abi = d['abi']
+	d = d['bsc']
+	address = d['address']
+	abi = d['abi']
 	bnb_url = "https://data-seed-prebsc-1-s1.binance.org:8545/"
 	w3 = Web3(HTTPProvider(bnb_url))
 	assert w3.is_connected(), f"Failed to connect to provider at {bnb_url}"
@@ -50,6 +50,7 @@ def is_ordered_block(w3, block_num):
 	ordered = False
 
 	# TODO YOUR CODE HERE
+	transactions = block['transactions']
 	for i in range(len(transactions) - 1):
 			tx1 = transactions[i]
 			tx2 = transactions[i + 1]
@@ -87,7 +88,11 @@ def get_contract_values(contract, admin_address, owner_address):
 	# TODO complete the following lines by performing contract calls
 	onchain_root = contract.functions.merkleRoot().call()  # Get and return the merkleRoot from the provided contract
 	has_role = contract.functions.hasRole(default_admin_role, admin_address).call()  # Check the contract to see if the address "admin_address" has the role "default_admin_role"
-	prime = contract.functions.prime(owner_address).call()  # Call the contract to get the prime owned by "owner_address"
+	try:
+        prime = contract.functions.prime(owner_address).call()
+    except Exception as e:
+        print(f"Error: {e}")
+        prime = None  # Call the contract to get the prime owned by "owner_address"
 
 	return onchain_root, has_role, prime
 
