@@ -52,19 +52,22 @@ def is_ordered_block(w3, block_num):
 	# TODO YOUR CODE HERE
 	transactions = block['transactions']
 	base_fee = block.get('baseFeePerGas', 0)
+	if len(transactions) == 0 || len(transactions) == 1:
+		return True
+		
 	for i in range(len(transactions) - 1):
-			tx1 = transactions[i]
-			tx2 = transactions[i + 1]
+		tx1 = transactions[i]
+		tx2 = transactions[i + 1]
 
-			if 'gasPrice' in tx1 and 'gasPrice' in tx2:
-					priority_fee1 = tx1['gasPrice']
-					priority_fee2 = tx2['gasPrice']
-			else:
-					priority_fee1 = (tx1['gasPrice'] - base_fee) if 'gasPrice' in tx1 else min(tx1.get('maxPriorityFeePerGas', 0), tx1.get('maxFeePerGas', 0) - base_fee)
-					priority_fee2 = (tx2['gasPrice'] - base_fee) if 'gasPrice' in tx2 else min(tx2.get('maxPriorityFeePerGas', 0), tx2.get('maxFeePerGas', 0) - base_fee)
+		if 'gasPrice' in tx1 and 'gasPrice' in tx2:
+				priority_fee1 = tx1['gasPrice']
+				priority_fee2 = tx2['gasPrice']
+		else:
+				priority_fee1 = (tx1['gasPrice'] - base_fee) if 'gasPrice' in tx1 else min(tx1.get('maxPriorityFeePerGas', 0), tx1.get('maxFeePerGas', 0) - base_fee)
+				priority_fee2 = (tx2['gasPrice'] - base_fee) if 'gasPrice' in tx2 else min(tx2.get('maxPriorityFeePerGas', 0), tx2.get('maxFeePerGas', 0) - base_fee)
 
-			if priority_fee1 < priority_fee2:
-					return False
+		if priority_fee1 < priority_fee2:
+				return False
 
 	return True
 
