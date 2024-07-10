@@ -37,11 +37,11 @@ def get_ape_info(apeID):
 		response = requests.get(token_uri)
 		metadata = response.json()
 		data['image'] = metadata.get('image', '')
-					attributes = metadata.get('attributes', [])
-					for attribute in attributes:
-							if attribute['trait_type'] == 'Eyes':
-									data['eyes'] = attribute['value']
-									break
+		attributes = metadata.get('attributes', [])
+		for attribute in attributes:
+				if attribute['trait_type'] == 'Eyes':
+						data['eyes'] = attribute['value']
+						break
 
 	
 	assert isinstance(data,dict), f'get_ape_info{apeID} should return a dict' 
