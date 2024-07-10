@@ -52,13 +52,13 @@ def is_ordered_block(w3, block_num):
 	# TODO YOUR CODE HERE
 	transactions = block['transactions']
 	if len(transactions) == 0 or len(transactions) == 1:
-        return True
+        	return True
 
-	    base_fee = block.get('baseFeePerGas', 0)
-	    if isinstance(base_fee, str):
+	base_fee = block.get('baseFeePerGas', 0)
+	if isinstance(base_fee, str):
 		base_fee = int(base_fee, 16)
 	
-	    for i in range(len(transactions) - 1):
+	for i in range(len(transactions) - 1):
 		tx1 = transactions[i]
 		tx2 = transactions[i + 1]
 	
@@ -72,7 +72,7 @@ def is_ordered_block(w3, block_num):
 		if priority_fee1 < priority_fee2:
 		    return False
 	
-	    return True
+	 return True
 
 
 def get_contract_values(contract, admin_address, owner_address):
