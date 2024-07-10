@@ -60,7 +60,7 @@ def is_ordered_block(w3, block_num):
 
 	for i in range(len(transactions) - 1):
 		tx1 = w3.eth.get_transaction(transactions[i])
-        	tx2 = w3.eth.get_transaction(transactions[i + 1])
+		tx2 = w3.eth.get_transaction(transactions[i + 1])
 
 		if 'gasPrice' in tx1 and 'gasPrice' in tx2:
 			priority_fee1 = int(tx1['gasPrice'])
