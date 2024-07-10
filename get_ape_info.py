@@ -35,6 +35,9 @@ def get_ape_info(apeID):
 		
 		token_uri = contract.functions.tokenURI(apeID).call()
 
+		if token_uri.startswith("ipfs://"):
+           		 token_uri = token_uri.replace("ipfs://", "https://ipfs.io/ipfs/")
+
 		response = requests.get(token_uri)
 		metadata = response.json()
 		data['image'] = metadata.get('image', '')
