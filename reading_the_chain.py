@@ -71,8 +71,7 @@ def is_ordered_block(w3, block_num):
 	
 		if priority_fee1 < priority_fee2:
 		    return False
-	
-	 return True
+	return True
 
 
 def get_contract_values(contract, admin_address, owner_address):
