@@ -20,6 +20,8 @@ with open('/home/codio/workspace/abi.json', 'r') as f:
 api_url = f"https://eth-mainnet.alchemyapi.io/v2/GOAqXUQqWHv71kkCL_vyf_joq0kEfqNG" #YOU WILL NEED TO TO PROVIDE THE URL OF AN ETHEREUM NODE
 provider = HTTPProvider(api_url)
 web3 = Web3(provider)
+
+web3.middleware_onion.inject(geth_poa_middleware, layer=0)
 contract = web3.eth.contract(address=contract_address, abi=abi)
 def get_ape_info(apeID):
 	assert isinstance(apeID,int), f"{apeID} is not an int"
