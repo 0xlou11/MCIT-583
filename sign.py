@@ -10,7 +10,7 @@ def sign(m):
 
     account = w3.eth.account.create()  # Eth account
     eth_address = account.address
-    private_key = account.privateKey
+    private_key = account.key
 
     # generate signature
     # your code here
