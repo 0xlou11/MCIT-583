@@ -8,7 +8,7 @@ def sign(m):
     # create an eth account and recover the address (derived from the public key) and private key
     # your code here
 
-    eth_address = w3.eth.account.create()  # Eth account
+    account = w3.eth.account.create()  # Eth account
     eth_address = account.address
     private_key = account.privateKey
 
