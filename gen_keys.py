@@ -21,17 +21,18 @@ def get_keys(challenge,keyId = 0, filename = "eth_mnemonic.txt"):
 
 	#YOUR CODE HERE
 
-    private_keys = []
+    mnemonics = []
     if os.path.exists(filename):
         with open(filename, 'r') as file:
-            private_keys = file.read().splitlines()
-    while len(private_keys) <= keyId:
-        private_key = w3.eth.account.create().privateKey.hex()
-        private_keys.append(private_key)
+            mnemonics = file.read().splitlines()
+    while len(mnemonics) <= keyId:
+        mnemonic = Account.create().mnemonic
+        mnemonics.append(mnemonic)
         with open(filename, 'a') as file:
             file.write(private_key + '\n')
-    private_key = private_keys[keyId]
-    acct = eth_account.Account.from_key(private_key)
+    mnemonic = mnemonics[keyId]
+    acct = eth_account.Account.from_mnemonic(mnemonic)
+
 
     sig = acct.sign_message(msg)
 
