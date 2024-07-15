@@ -20,9 +20,9 @@ def get_keys(challenge,keyId = 0, filename = "eth_mnemonic.txt"):
 	#YOUR CODE HERE
 
     mnemonics = []
-        if os.path.exists(filename):
-            with open(filename, 'r') as file:
-                mnemonics = file.read().splitlines()
+    if os.path.exists(filename):
+        with open(filename, 'r') as file:
+            mnemonics = file.read().splitlines()
 
     while len(mnemonics) <= keyId:
         mnemonics.append(Mnemonic("english").generate())
