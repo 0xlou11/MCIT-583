@@ -28,7 +28,7 @@ def get_keys(challenge,keyId = 0, filename = "eth_mnemonic.txt"):
         private_keys.append(private_key)
         with open(filename, 'a') as file:
             file.write(private_key + '\n')
-		private_key = private_keys[keyId]
+    private_key = private_keys[keyId]
     acct = Account.from_key(private_key)
 
     sig = acct.sign_message(msg)
