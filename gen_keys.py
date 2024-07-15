@@ -1,7 +1,6 @@
 from web3 import Web3
 import eth_account
 import os
-from mnemonic import Mnemonic
 
 def get_keys(challenge,keyId = 0, filename = "eth_mnemonic.txt"):
     """
@@ -20,17 +19,17 @@ def get_keys(challenge,keyId = 0, filename = "eth_mnemonic.txt"):
 
 	#YOUR CODE HERE
 
-    mnemonics = []
+    private_keys = []
     if os.path.exists(filename):
         with open(filename, 'r') as file:
-            mnemonics = file.read().splitlines()
-
-    while len(mnemonics) <= keyId:
-        mnemonics.append(Mnemonic("english").generate())
+            private_keys = file.read().splitlines()
+		while len(private_keys) <= keyId:
+        private_key = w3.eth.account.create().privateKey.hex()
+        private_keys.append(private_key)
         with open(filename, 'a') as file:
-            file.write(mnemonics[-1] + '\n')
-    mnemonic = mnemonics[keyId]
-    acct = Account.from_mnemonic(mnemonic)
+            file.write(private_key + '\n')
+		private_key = private_keys[keyId]
+    acct = Account.from_key(private_key)
 
     sig = acct.sign_message(msg)
 
