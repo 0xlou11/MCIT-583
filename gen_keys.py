@@ -23,7 +23,7 @@ def get_keys(challenge,keyId = 0, filename = "eth_mnemonic.txt"):
     if os.path.exists(filename):
         with open(filename, 'r') as file:
             private_keys = file.read().splitlines()
-		while len(private_keys) <= keyId:
+    while len(private_keys) <= keyId:
         private_key = w3.eth.account.create().privateKey.hex()
         private_keys.append(private_key)
         with open(filename, 'a') as file:
