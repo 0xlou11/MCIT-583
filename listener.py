@@ -64,8 +64,9 @@ def scanBlocks(chain,start_block,end_block,contract_address):
             #print( f"Got {len(events)} entries for block {block_num}" )
             #// YOUR CODE HERE
             process_events(events)
+		
 
-def process_events(events):
+    def process_events(events):
         for event in events:
             event_data = {
                 'chain': chain,
