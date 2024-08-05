@@ -56,17 +56,6 @@ def scanBlocks(chain,start_block,end_block,contract_address):
         events = event_filter.get_all_entries()
         #print( f"Got {len(events)} entries for block {block_num}" )
         #// YOUR CODE HERE
-        process_events(events)
-    else:
-        for block_num in range(start_block,end_block+1):
-            event_filter = contract.events.Deposit.create_filter(fromBlock=block_num,toBlock=block_num,argument_filters=arg_filter)
-            events = event_filter.get_all_entries()
-            #print( f"Got {len(events)} entries for block {block_num}" )
-            #// YOUR CODE HERE
-            process_events(events)
-		
-
-    def process_events(events):
         for event in events:
             event_data = {
                 'chain': chain,
@@ -78,4 +67,21 @@ def scanBlocks(chain,start_block,end_block,contract_address):
                 'date': datetime.utcfromtimestamp(w3.eth.get_block(event['blockNumber'])['timestamp']).strftime('%Y-%m-%d %H:%M:%S')
             }
             events_list.append(event_data)
+    else:
+        for block_num in range(start_block,end_block+1):
+            event_filter = contract.events.Deposit.create_filter(fromBlock=block_num,toBlock=block_num,argument_filters=arg_filter)
+            events = event_filter.get_all_entries()
+            #print( f"Got {len(events)} entries for block {block_num}" )
+            #// YOUR CODE HERE
+            for event in events:
+                event_data = {
+                    'chain': chain,
+                    'token': event['args']['token'],
+                    'recipient': event['args']['recipient'],
+                    'amount': event['args']['amount'],
+                    'transactionHash': event['transactionHash'].hex(),
+                    'address': contract_address,
+                    'date': datetime.utcfromtimestamp(w3.eth.get_block(event['blockNumber'])['timestamp']).strftime('%Y-%m-%d %H:%M:%S')
+                }
+                events_list.append(event_data)
 
