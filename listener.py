@@ -65,3 +65,16 @@ def scanBlocks(chain,start_block,end_block,contract_address):
             #// YOUR CODE HERE
             process_events(events)
 
+def process_events(events):
+        for event in events:
+            event_data = {
+                'chain': chain,
+                'token': event['args']['token'],
+                'recipient': event['args']['recipient'],
+                'amount': event['args']['amount'],
+                'transactionHash': event['transactionHash'].hex(),
+                'address': contract_address,
+                'date': datetime.utcfromtimestamp(w3.eth.get_block(event['blockNumber'])['timestamp']).strftime('%Y-%m-%d %H:%M:%S')
+            }
+            events_list.append(event_data)
+
