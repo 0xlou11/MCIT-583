@@ -53,7 +53,9 @@ def scanBlocks(chain,start_block,end_block,contract_address):
     
     #Create csv
     headers = ['chain', 'token', 'recipient', 'amount', 'transactionHash', 'address']
-    if not os.path.isfile(eventfile):
+    try:
+        pd.read_csv(eventfile)
+    except FileNotFoundError:
         pd.DataFrame(columns=headers).to_csv(eventfile, index=False)
 
     if end_block - start_block < 30:
