@@ -50,6 +50,11 @@ def scanBlocks(chain,start_block,end_block,contract_address):
         print( f"Scanning block {start_block} on {chain}" )
     else:
         print( f"Scanning blocks {start_block} - {end_block} on {chain}" )
+    
+    #Create csv
+    headers = ['chain', 'token', 'recipient', 'amount', 'transactionHash', 'address']
+    if not os.path.isfile(eventfile):
+        pd.DataFrame(columns=headers).to_csv(eventfile, index=False)
 
     if end_block - start_block < 30:
         event_filter = contract.events.Deposit.create_filter(fromBlock=start_block,toBlock=end_block,argument_filters=arg_filter)
@@ -64,12 +69,12 @@ def scanBlocks(chain,start_block,end_block,contract_address):
                 'recipient': event['args']['recipient'],
                 'amount': event['args']['amount'],
                 'transactionHash': event['transactionHash'].hex(),
-                'address': contract_address,
-                'date': datetime.utcfromtimestamp(w3.eth.get_block(event['blockNumber'])['timestamp']).strftime('%Y-%m-%d %H:%M:%S')
+                'address': contract_address
             }
             rows.append(row)
-        df = pd.DataFrame(rows)
-        df.to_csv(eventfile, mode='a', index=False, header=not pd.read_csv(eventfile).empty)
+        if rows:
+            df = pd.DataFrame(rows)
+            df.to_csv(eventfile, mode='a', index=False, header=False)
     else:
         for block_num in range(start_block,end_block+1):
             event_filter = contract.events.Deposit.create_filter(fromBlock=block_num,toBlock=block_num,argument_filters=arg_filter)
@@ -84,10 +89,9 @@ def scanBlocks(chain,start_block,end_block,contract_address):
                     'recipient': event['args']['recipient'],
                     'amount': event['args']['amount'],
                     'transactionHash': event['transactionHash'].hex(),
-                    'address': contract_address,
-                    'date': datetime.utcfromtimestamp(w3.eth.get_block(event['blockNumber'])['timestamp']).strftime('%Y-%m-%d %H:%M:%S')
+                    'address': contract_address
                 }
                 rows.append(row)
-            df = pd.DataFrame(rows)
-            df.to_csv(eventfile, mode='a', index=False, header=not pd.read_csv(eventfile).empty)
-
+            if rows:
+                df = pd.DataFrame(rows)
+                df.to_csv(eventfile, mode='a', index=False, header=False)
