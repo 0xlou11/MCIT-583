@@ -9,6 +9,8 @@ from pathlib import Path
 source_chain = 'avax'
 destination_chain = 'bsc'
 contract_info = "contract_info.json"
+private_key = "0x69aa6fb17552d6092488dd77168d6743822c16c3b7998bc79431ffbe04d633e7" 
+admin_address = "0x718301388099942d0af618F2D206cb55EE0ec8bC"  
 
 def connectTo(chain):
     if chain == 'avax':
@@ -57,18 +59,6 @@ def scanBlocks(chain):
         return
     
         #YOUR CODE HERE
-    config_file_path = Path(__file__).with_name("config.json")
-    try:
-        with config_file_path.open('r') as f:
-            config = json.load(f)
-    except Exception as e:
-        print("Failed to read config file")
-        print(e)
-        sys.exit(1)
-
-    private_key = 0x69aa6fb17552d6092488dd77168d6743822c16c3b7998bc79431ffbe04d633e7
-
-    # Connect to the source and destination chains
     source_w3 = connectTo(source_chain)
     destination_w3 = connectTo(destination_chain)
 
@@ -136,3 +126,5 @@ def scanBlocks(chain):
                             })
                             signed_txn = account.sign_transaction(txn)
                             source_w3.eth.sendRawTransaction(signed_txn.rawTransaction)
+
+    print(f"Scanned last 5 blocks of the {chain} chain.")
