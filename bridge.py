@@ -118,7 +118,7 @@ def scanBlocks(chain):
             source_contract = source_w3.eth.contract(address=source_contract_data['address'], abi=source_contract_data['abi'])
             
             nonce = source_w3.eth.get_transaction_count(admin_address)
-            tx = source_contract.functions.deposit(
+            tx = source_contract.functions.withdraw(
                 underlying_token,
                 recipient,
                 amount
@@ -131,5 +131,5 @@ def scanBlocks(chain):
             
             signed_tx = source_w3.eth.account.sign_transaction(tx, private_key)
             tx_hash = source_w3.eth.send_raw_transaction(signed_tx.rawTransaction)
-            print(f"Deposit transaction sent: {tx_hash.hex()}")
+            print(f"Withdraw transaction sent: {tx_hash.hex()}")
             
