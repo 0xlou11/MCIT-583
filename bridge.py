@@ -42,9 +42,6 @@ def getContractInfo(chain):
 
     return contracts[chain]
 
-
-
-
 def scanBlocks(chain):
     """
         chain - (string) should be either "source" or "destination"
@@ -59,72 +56,126 @@ def scanBlocks(chain):
         return
     
         #YOUR CODE HERE
-    source_w3 = connectTo(source_chain)
-    destination_w3 = connectTo(destination_chain)
+    w3 = connectTo(source_chain if chain == 'source' else destination_chain)
+    
+    contract_data = getContractInfo(source_chain if chain == 'source' else destination_chain)
+    contract_address = contract_data['address']
+    contract_abi = contract_data['abi']
 
-    # Get contract information
-    source_contract_info = getContractInfo(source_chain)
-    destination_contract_info = getContractInfo(destination_chain)
-
-    source_contract_address = source_contract_info["address"]
-    source_contract_abi = source_contract_info["abi"]
-    destination_contract_address = destination_contract_info["address"]
-    destination_contract_abi = destination_contract_info["abi"]
-
-    # Create contract instances
-    source_contract = source_w3.eth.contract(address=source_contract_address, abi=source_contract_abi)
-    destination_contract = destination_w3.eth.contract(address=destination_contract_address, abi=destination_contract_abi)
-
-    # Define the event signatures
-    deposit_event_signature = source_contract.events.Deposit().signature
-    unwrap_event_signature = destination_contract.events.Unwrap().signature
-
-    # Scan the last 5 blocks for the specified chain
+    contract = w3.eth.contract(address=contract_address, abi=contract_abi)
+    
+    latest_block = w3.eth.get_block_number()
+    start_block = max(0, latest_block - 4)  
+    
     if chain == 'source':
-        w3 = source_w3
-        contract = source_contract
-        event_signature = deposit_event_signature
-        other_contract = destination_contract
-    else:
-        w3 = destination_w3
-        contract = destination_contract
-        event_signature = unwrap_event_signature
-        other_contract = source_contract
+        deposit_event_abi = {
+            "type": "event",
+            "name": "Deposit",
+            "inputs": [
+                {
+                    "name": "_token",
+                    "type": "address",
+                    "indexed": True
+                },
+                {
+                    "name": "_recipient",
+                    "type": "address",
+                    "indexed": True
+                },
+                {
+                    "name": "_amount",
+                    "type": "uint256",
+                    "indexed": False
+                }
+            ]
+        }
+        
+        event_filter = contract.events.Deposit.create_filter(fromBlock=start_block, toBlock=latest_block)
+        events = event_filter.get_all_entries()
+        
+        for event in events:
 
-    latest_block = w3.eth.blockNumber
-    blocks_to_scan = range(latest_block - 4, latest_block + 1)
+            dest_w3 = connectTo(destination_chain)
+            dest_contract_data = getContractInfo(destination_chain)
+            dest_contract = dest_w3.eth.contract(address=dest_contract_data['address'], abi=dest_contract_data['abi'])
+            
 
-    account = w3.eth.account.privateKeyToAccount(private_key)
+            nonce = dest_w3.eth.get_transaction_count(admin_address)
+            tx = dest_contract.functions.wrap(
+                event['args']['_recipient'],
+                event['args']['_amount']
+            ).build_transaction({
+                'chainId': dest_w3.eth.chain_id,
+                'gas': 2000000,
+                'gasPrice': dest_w3.eth.gas_price,
+                'nonce': nonce,
+            })
+            
 
-    for block_number in blocks_to_scan:
-        block = w3.eth.getBlock(block_number, full_transactions=True)
-        for tx in block.transactions:
-            receipt = w3.eth.getTransactionReceipt(tx.hash)
-            for log in receipt.logs:
-                if log.topics[0].hex() == event_signature:
-                    event = contract.events.Deposit().processReceipt(receipt) if chain == 'source' else contract.events.Unwrap().processReceipt(receipt)
-                    if event:
-                        if chain == 'source':
-                            # Call the wrap function on the destination chain
-                            print(f"Found Deposit event in block {block_number}. Calling wrap function on destination chain.")
-                            txn = other_contract.functions.wrap(event['args']['amount']).buildTransaction({
-                                'chainId': destination_w3.eth.chain_id,
-                                'gas': 2000000,
-                                'gasPrice': destination_w3.eth.gas_price,
-                                'nonce': destination_w3.eth.getTransactionCount(account.address),
-                            })
-                            signed_txn = account.sign_transaction(txn)
-                            destination_w3.eth.sendRawTransaction(signed_txn.rawTransaction)
-                        else:
-                            # Call the withdraw function on the source chain
-                            print(f"Found Unwrap event in block {block_number}. Calling withdraw function on source chain.")
-                            txn = other_contract.functions.withdraw(event['args']['amount']).buildTransaction({
-                                'chainId': source_w3.eth.chain_id,
-                                'gas': 2000000,
-                                'gasPrice': source_w3.eth.gas_price,
-                                'nonce': source_w3.eth.getTransactionCount(account.address),
-                            })
-                            signed_txn = account.sign_transaction(txn)
-                            source_w3.eth.sendRawTransaction(signed_txn.rawTransaction)
+            signed_tx = dest_w3.eth.account.sign_transaction(tx, private_key)
+            tx_hash = dest_w3.eth.send_raw_transaction(signed_tx.rawTransaction)
+            print(f"Wrap transaction sent: {tx_hash.hex()}")
+            
+    elif chain == 'destination':
 
-    print(f"Scanned last 5 blocks of the {chain} chain.")
+        unwrap_event_abi = {
+            "type": "event",
+            "name": "Unwrap",
+            "inputs": [
+            {
+                "name": "underlying_token",
+                "type": "address",
+                "indexed": true,
+                "internalType": "address"
+            },
+            {
+                "name": "wrapped_token",
+                "type": "address",
+                "indexed": true,
+                "internalType": "address"
+            },
+            {
+                "name": "frm",
+                "type": "address",
+                "indexed": false,
+                "internalType": "address"
+            },
+            {
+                "name": "to",
+                "type": "address",
+                "indexed": true,
+                "internalType": "address"
+            },
+            {
+                "name": "amount",
+                "type": "uint256",
+                "indexed": false,
+                "internalType": "uint256"
+            }
+            ],
+            "anonymous": false
+        }
+        
+        event_filter = contract.events.Unwrap.create_filter(fromBlock=start_block, toBlock=latest_block)
+        events = event_filter.get_all_entries()
+        
+        for event in events:
+            source_w3 = connectTo(source_chain)
+            source_contract_data = getContractInfo(source_chain)
+            source_contract = source_w3.eth.contract(address=source_contract_data['address'], abi=source_contract_data['abi'])
+            
+            nonce = source_w3.eth.get_transaction_count(admin_address)
+            tx = source_contract.functions.deposit(
+                event['args']['_token'],
+                event['args']['_recipient'],
+                event['args']['_amount']
+            ).build_transaction({
+                'chainId': source_w3.eth.chain_id,
+                'gas': 2000000,
+                'gasPrice': source_w3.eth.gas_price,
+                'nonce': nonce,
+            })
+            
+            signed_tx = source_w3.eth.account.sign_transaction(tx, private_key)
+            tx_hash = source_w3.eth.send_raw_transaction(signed_tx.rawTransaction)
+            print(f"Deposit transaction sent: {tx_hash.hex()}")
