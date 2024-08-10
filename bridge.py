@@ -56,7 +56,7 @@ def scanBlocks(chain):
         return
     
         #YOUR CODE HERE
-   w3 = connectTo(source_chain if chain == 'source' else destination_chain)
+    w3 = connectTo(source_chain if chain == 'source' else destination_chain)
     
     contract_data = getContractInfo(source_chain if chain == 'source' else destination_chain)
     contract_address = contract_data['address']
