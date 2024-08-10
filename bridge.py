@@ -56,18 +56,22 @@ def scanBlocks(chain):
         return
     
         #YOUR CODE HERE
-    w3 = connectTo(chain)
     
-    contract_data = getContractInfo(chain)
-    contract_address = contract_data['address']
-    contract_abi = contract_data['abi']
-    
-    contract = w3.eth.contract(address=contract_address, abi=contract_abi)
-    
-    latest_block = w3.eth.block_number
-    start_block = max(0, latest_block - 4)
     
     if chain == 'source':
+
+        w3 = connectTo('avax')
+    
+        contract_data = getContractInfo(chain)
+        contract_address = contract_data['address']
+        contract_abi = contract_data['abi']
+        
+        contract = w3.eth.contract(address=contract_address, abi=contract_abi)
+        
+        latest_block = w3.eth.block_number
+        start_block = max(0, latest_block - 4)
+
+        
         event_filter = contract.events.Deposit.create_filter(fromBlock=start_block, toBlock=latest_block)
         events = event_filter.get_all_entries()
         
@@ -92,6 +96,18 @@ def scanBlocks(chain):
             print(f"Wrap transaction sent: {tx_hash.hex()}")
             
     elif chain == 'destination':
+
+        w3 = connectTo('bsc')
+    
+        contract_data = getContractInfo(chain)
+        contract_address = contract_data['address']
+        contract_abi = contract_data['abi']
+        
+        contract = w3.eth.contract(address=contract_address, abi=contract_abi)
+        
+        latest_block = w3.eth.block_number
+        start_block = max(0, latest_block - 4)
+    
         event_filter = contract.events.Unwrap.create_filter(fromBlock=start_block, toBlock=latest_block)
         events = event_filter.get_all_entries()
         
