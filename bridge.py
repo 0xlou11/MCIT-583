@@ -56,50 +56,26 @@ def scanBlocks(chain):
         return
     
         #YOUR CODE HERE
-    w3 = connectTo(source_chain if chain == 'source' else destination_chain)
+   w3 = connectTo(source_chain if chain == 'source' else destination_chain)
     
     contract_data = getContractInfo(source_chain if chain == 'source' else destination_chain)
     contract_address = contract_data['address']
     contract_abi = contract_data['abi']
-
+    
     contract = w3.eth.contract(address=contract_address, abi=contract_abi)
     
-    latest_block = w3.eth.get_block_number()
-    start_block = max(0, latest_block - 4)  
+    latest_block = w3.eth.block_number
+    start_block = max(0, latest_block - 4)
     
     if chain == 'source':
-        deposit_event_abi = {
-            "type": "event",
-            "name": "Deposit",
-            "inputs": [
-                {
-                    "name": "_token",
-                    "type": "address",
-                    "indexed": True
-                },
-                {
-                    "name": "_recipient",
-                    "type": "address",
-                    "indexed": True
-                },
-                {
-                    "name": "_amount",
-                    "type": "uint256",
-                    "indexed": False
-                }
-            ]
-        }
-        
         event_filter = contract.events.Deposit.create_filter(fromBlock=start_block, toBlock=latest_block)
         events = event_filter.get_all_entries()
         
         for event in events:
-
             dest_w3 = connectTo(destination_chain)
             dest_contract_data = getContractInfo(destination_chain)
             dest_contract = dest_w3.eth.contract(address=dest_contract_data['address'], abi=dest_contract_data['abi'])
             
-
             nonce = dest_w3.eth.get_transaction_count(admin_address)
             tx = dest_contract.functions.wrap(
                 event['args']['_recipient'],
@@ -111,51 +87,11 @@ def scanBlocks(chain):
                 'nonce': nonce,
             })
             
-
             signed_tx = dest_w3.eth.account.sign_transaction(tx, private_key)
             tx_hash = dest_w3.eth.send_raw_transaction(signed_tx.rawTransaction)
             print(f"Wrap transaction sent: {tx_hash.hex()}")
             
     elif chain == 'destination':
-
-        unwrap_event_abi = {
-            "type": "event",
-            "name": "Unwrap",
-            "inputs": [
-            {
-                "name": "underlying_token",
-                "type": "address",
-                "indexed": true,
-                "internalType": "address"
-            },
-            {
-                "name": "wrapped_token",
-                "type": "address",
-                "indexed": true,
-                "internalType": "address"
-            },
-            {
-                "name": "frm",
-                "type": "address",
-                "indexed": false,
-                "internalType": "address"
-            },
-            {
-                "name": "to",
-                "type": "address",
-                "indexed": true,
-                "internalType": "address"
-            },
-            {
-                "name": "amount",
-                "type": "uint256",
-                "indexed": false,
-                "internalType": "uint256"
-            }
-            ],
-            "anonymous": false
-        }
-        
         event_filter = contract.events.Unwrap.create_filter(fromBlock=start_block, toBlock=latest_block)
         events = event_filter.get_all_entries()
         
