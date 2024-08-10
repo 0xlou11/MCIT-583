@@ -56,9 +56,9 @@ def scanBlocks(chain):
         return
     
         #YOUR CODE HERE
-    w3 = connectTo(source_chain if chain == 'source' else destination_chain)
+    w3 = connectTo(chain)
     
-    contract_data = getContractInfo(source_chain if chain == 'source' else destination_chain)
+    contract_data = getContractInfo(chain)
     contract_address = contract_data['address']
     contract_abi = contract_data['abi']
     
@@ -72,14 +72,14 @@ def scanBlocks(chain):
         events = event_filter.get_all_entries()
         
         for event in events:
-            dest_w3 = connectTo(destination_chain)
-            dest_contract_data = getContractInfo(destination_chain)
+            dest_w3 = connectTo('destination')
+            dest_contract_data = getContractInfo('destination')
             dest_contract = dest_w3.eth.contract(address=dest_contract_data['address'], abi=dest_contract_data['abi'])
             
             nonce = dest_w3.eth.get_transaction_count(admin_address)
             tx = dest_contract.functions.wrap(
-                event['args']['_recipient'],
-                event['args']['_amount']
+                event['args']['recipient'],
+                event['args']['amount']
             ).build_transaction({
                 'chainId': dest_w3.eth.chain_id,
                 'gas': 2000000,
@@ -96,15 +96,15 @@ def scanBlocks(chain):
         events = event_filter.get_all_entries()
         
         for event in events:
-            source_w3 = connectTo(source_chain)
-            source_contract_data = getContractInfo(source_chain)
+            source_w3 = connectTo('source')
+            source_contract_data = getContractInfo('source')
             source_contract = source_w3.eth.contract(address=source_contract_data['address'], abi=source_contract_data['abi'])
             
             nonce = source_w3.eth.get_transaction_count(admin_address)
             tx = source_contract.functions.deposit(
-                event['args']['_token'],
-                event['args']['_recipient'],
-                event['args']['_amount']
+                event['args']['underlying_token'],
+                event['args']['to'],
+                event['args']['amount']
             ).build_transaction({
                 'chainId': source_w3.eth.chain_id,
                 'gas': 2000000,
