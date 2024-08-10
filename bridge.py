@@ -79,6 +79,7 @@ def scanBlocks(chain):
         for event in events:
             amount = event['args']['amount']
             recipient = event['args']['recipient']
+            token = event['args']['token']
             print(f"Processing Deposit event: {amount} tokens to {recipient}")
             
             dest_w3 = connectTo('bsc')
@@ -87,6 +88,7 @@ def scanBlocks(chain):
             
             nonce = dest_w3.eth.get_transaction_count(admin_address)
             tx = dest_contract.functions.wrap(
+                token,
                 recipient,
                 amount
             ).build_transaction({
