@@ -131,6 +131,3 @@ def scanBlocks(chain):
             tx_hash = source_w3.eth.send_raw_transaction(signed_tx.rawTransaction)
             print(f"Deposit transaction sent: {tx_hash.hex()}")
             
-    except Exception as e:
-        print(f"Error running scanBlocks('{chain}')")
-        print(e)
